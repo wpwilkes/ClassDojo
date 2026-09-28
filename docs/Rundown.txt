@@ -1,0 +1,16 @@
+Basic Info
+- Team Name: Tigers
+- Project Name: Summit
+- Members: Ayman, Jalal, Kahn, Wesley
+
+Project Resources
+- https://github.com/wpwilkes/Summit
+- https://docs.google.com/spreadsheets/d/19UElDNF0ggb_I-qmuH17bF6N3EUF3DUOR42CdqZqaaY/edit?gid=0#gid=0
+
+Project Narrative
+- Reddit with post reply summaries.
+
+- This is a hypothesis of “how” you will build it. Include any pertinent tools, languages,
+libraries, hardware, as well as appropriate diagrams for your systems. Convince us you
+have done the homework to know what competencies and activities should be on your
+backlog.. Eg. tools, library, hardware, IDE, target platform or OS, APIs, service
