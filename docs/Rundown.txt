@@ -1,0 +1,18 @@
+Basic Info
+- Team Name: Tigers
+- Project Name: Summit
+- Members: Ayman, Jalal, Kahn, Wesley
+
+Project Resources
+- https://github.com/wpwilkes/Summit
+- https://docs.google.com/spreadsheets/d/19UElDNF0ggb_I-qmuH17bF6N3EUF3DUOR42CdqZqaaY/edit?gid=0#gid=0
+
+Project Narrative
+- Reddit with post reply summaries.
+
+Summit will be a web application with a frontend, backend, database, and LLM service. The frontend will
+let users create accounts, log in, create and view posts, add comments, and see summaries of post
+replies. This project will use JavaScript, Python, HTML, and CSS. Visual Studio Code will be used to
+write the code. The backend will manage users, posts, comments, the database, and the LLM service.
+The database will be implemented in PostgreSQL. GitHub will be used to save the code and support team collaboration.
+
