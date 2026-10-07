@@ -1,9 +1,2 @@
-import dotenv from 'dotenv';
-import path from 'path';
-
-dotenv.config({
-  path: path.resolve(__dirname, '../../../../.env'),
-});
-
-export const HOST = process.env.HOST ?? '127.0.0.1';
-export const PORT = Number(process.env.PORT ?? 3000);
+export const SERVER_HOST: string = process.env.SERVER_HOST ?? '0.0.0.0';
+export const SERVER_PORT: number = Number(process.env.SERVER_PORT ?? 3000);
