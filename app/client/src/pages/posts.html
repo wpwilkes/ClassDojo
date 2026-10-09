@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1"
+    />
+    <title>Summit Posts</title>
+    <link
+      rel="stylesheet"
+      href="/posts-assets/pages/posts.css"
+    />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <span class="logo">S</span>
+          summit
+        </div>
+
+        <div class="profile">
+          <span class="avatar">A</span>
+          Ayman
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar card">
+        <div class="side-title">DISCOVER</div>
+
+        <button class="nav active" data-category="">
+          Home feed
+        </button>
+
+        <div class="side-title">CATEGORIES</div>
+        <div id="categoryNav"></div>
+      </aside>
+
+      <main>
+        <div class="feed-title">
+          <div>
+            <span class="eyebrow">SUMMIT COMMUNITY</span>
+            <h1 id="feedHeading">Home feed</h1>
+          </div>
+
+          <span id="postCount"></span>
+        </div>
+
+        <label class="mobile-filter">
+          Filter posts
+
+          <select
+            id="mobileCategory"
+            aria-label="Filter posts by category"
+          >
+            <option value="">All categories</option>
+          </select>
+        </label>
+
+        <form id="postForm" class="composer card">
+          <div class="composer-row">
+            <input
+              id="title"
+              aria-label="Post title"
+              maxlength="160"
+              placeholder="Post title"
+              required
+            />
+          </div>
+
+          <textarea
+            id="description"
+            aria-label="Post content"
+            maxlength="10000"
+            rows="4"
+            placeholder="What do you want to discuss?"
+            required
+          ></textarea>
+
+          <div class="toolbar">
+            <select
+              id="category"
+              aria-label="Category"
+            ></select>
+
+            <label class="anonymous">
+              <input id="anonymous" type="checkbox" />
+              Post anonymously
+            </label>
+
+            <span class="spacer"></span>
+
+            <button
+              class="btn btn-primary"
+              type="submit"
+            >
+              Publish post
+            </button>
+          </div>
+        </form>
+
+        <div id="notice" role="alert"></div>
+        <section id="feed"></section>
+      </main>
+
+      <aside class="about card">
+        <div class="about-cover"></div>
+
+        <div class="about-body">
+          <span class="eyebrow">WELCOME TO</span>
+          <h3>Summit</h3>
+
+          <p>
+            Create posts, explore categories, vote, and build useful
+            discussions with the community.
+          </p>
+        </div>
+      </aside>
+    </div>
+
+    <div id="overlay" class="overlay">
+      <section
+        class="modal card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detailTitle"
+      >
+        <div class="modal-head">
+          <div>
+            <span class="eyebrow">POST DISCUSSION</span>
+            <h1 id="detailTitle"></h1>
+          </div>
+
+          <button
+            id="closeModal"
+            aria-label="Close post"
+            class="close"
+          >
+            ×
+          </button>
+        </div>
+
+        <div id="modalNotice" role="alert"></div>
+        <div id="detailMeta" class="meta"></div>
+        <p id="detailText" class="detail-text"></p>
+
+        <div id="ownerEdit" class="edit-fields hidden">
+          <input
+            id="editTitle"
+            aria-label="Edit title"
+            maxlength="160"
+          />
+
+          <textarea
+            id="editDescription"
+            aria-label="Edit content"
+            maxlength="10000"
+            rows="5"
+          ></textarea>
+
+          <select
+            id="editCategory"
+            aria-label="Edit category"
+          ></select>
+
+          <label class="anonymous">
+            <input id="editAnonymous" type="checkbox" />
+            Post anonymously
+          </label>
+
+          <div>
+            <button
+              id="saveEdit"
+              class="btn btn-primary"
+            >
+              Save changes
+            </button>
+
+            <button
+              id="deletePost"
+              class="btn btn-ghost"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <section class="comments">
+          <h3>Comments</h3>
+
+          <form id="commentForm" class="comment-form">
+            <textarea
+              id="commentBody"
+              aria-label="Comment"
+              maxlength="2000"
+              placeholder="Add a comment..."
+              required
+            ></textarea>
+
+            <button class="btn btn-primary">
+              Submit
+            </button>
+          </form>
+
+          <div id="commentList"></div>
+        </section>
+      </section>
+    </div>
+
+    <script
+      type="module"
+      src="/posts-assets/pages/posts.js"
+    ></script>
+  </body>
+</html>

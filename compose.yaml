@@ -1,0 +1,21 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: app/server/Dockerfile
+      target: runtime
+    ports:
+      - '127.0.0.1:${PORT:-3000}:3000'
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      # Local demo identity until real authentication is connected.
+      ALLOW_DEV_USER_HEADERS: '${ALLOW_DEV_USER_HEADERS:-true}'
+
+  tests:
+    profiles: ['test']
+    build:
+      context: .
+      dockerfile: app/server/Dockerfile
+      target: test
+    command: ['npm', 'test']

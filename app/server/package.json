@@ -28,11 +28,13 @@
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
-    "typecheck": "tsc --noEmit",
-    "test": "tsx --test",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.tests.json",
+    "test": "node --import tsx --test \"tests/**/*.test.ts\"",
     "format": "prettier --write . --ignore-path ../../.prettierignore",
-    "format:check": "prettier --check --ignore-path ../../.prettierignore",
+    "format:check": "prettier --check . ../client/src --ignore-path ../../.prettierignore",
     "lint": "eslint src tests",
-    "lint:fix": "eslint src tests --fix"
+    "lint:fix": "eslint src tests --fix",
+    "test:unit": "node --import tsx --test \"tests/unit/**/*.test.ts\"",
+    "test:integration": "node --import tsx --test \"tests/integration/**/*.test.ts\""
   }
 }
