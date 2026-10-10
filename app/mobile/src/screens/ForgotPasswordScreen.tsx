@@ -13,84 +13,81 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import PasswordInput from '../components/PasswordInput';
 import { RootStackParamList } from '../types/navigation.types';
-import {
-  LoginFormErrors,
-  hasLoginErrors,
-  validateLoginForm,
-} from '../utils/authValidation';
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
-  'Login'
+  'ForgotPassword'
 >;
 
-export default function LoginScreen({
+export default function ForgotPasswordScreen({
   navigation,
 }: Props) {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const [errors, setErrors] =
-    useState<LoginFormErrors>({});
-
-  const passwordRef = useRef<TextInput>(null);
-
-  const handleLogin = () => {
-    Keyboard.dismiss();
-
-    const validationErrors = validateLoginForm({
-      email,
-      password,
-    });
-
-    setErrors(validationErrors);
-
-    if (hasLoginErrors(validationErrors)) {
-      return;
-    }
-
-    /*
-     * FUTURE BACKEND STEP:
-     *
-     * Send email and password to Wesley's login API.
-     *
-     * If login succeeds:
-     * - receive/store authentication token
-     * - navigate to the main Summit app
-     *
-     * If login fails:
-     * - show the server error
-     */
-  };
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
 
-    if (errors.email) {
-      setErrors((currentErrors) => ({
-        ...currentErrors,
-        email: undefined,
-      }));
+    if (errorMessage) {
+      setErrorMessage('');
     }
   };
 
-  const handlePasswordChange = (value: string) => {
-    setPassword(value);
+  const scrollFormIntoView = () => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({
+        animated: true,
+      });
+    }, 250);
+  };
 
-    if (errors.password) {
-      setErrors((currentErrors) => ({
-        ...currentErrors,
-        password: undefined,
-      }));
+  const handleRecovery = () => {
+    Keyboard.dismiss();
+
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      setErrorMessage('Email is required.');
+      return;
     }
+
+    const emailPattern =
+      /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/;
+
+    if (!emailPattern.test(trimmedEmail)) {
+      setErrorMessage(
+        'Please enter a valid email address.'
+      );
+      return;
+    }
+
+    setErrorMessage('');
+
+    /*
+     * FUTURE BACKEND STEP:
+     *
+     * Send the email to Wesley's password
+     * recovery API.
+     *
+     * After the backend accepts the request,
+     * show a privacy-safe message such as:
+     *
+     * "If an account exists for this email,
+     * password recovery instructions have
+     * been sent."
+     *
+     * Do NOT show:
+     * "This email is not registered."
+     */
   };
 
   return (
     <SafeAreaView
       style={styles.safeArea}
-      edges={['top', 'bottom']}
+      edges={['left', 'right', 'bottom']}
     >
       <KeyboardAvoidingView
         style={styles.container}
@@ -99,8 +96,10 @@ export default function LoginScreen({
             ? 'padding'
             : 'height'
         }
+        keyboardVerticalOffset={0}
       >
         <ScrollView
+          ref={scrollViewRef}
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode={
@@ -110,8 +109,6 @@ export default function LoginScreen({
           }
           showsVerticalScrollIndicator={false}
         >
-          {/* Summit Brand */}
-
           <View style={styles.brandContainer}>
             <View style={styles.logoBox}>
               <Text style={styles.logoText}>S</Text>
@@ -123,14 +120,14 @@ export default function LoginScreen({
           </View>
 
           <Text style={styles.title}>
-            Welcome Back
+            Forgot Password
           </Text>
 
           <Text style={styles.subtitle}>
-            Log in to continue the discussion.
+            Enter the email associated with your
+            account and we will send password
+            recovery instructions.
           </Text>
-
-          {/* Email */}
 
           <Text style={styles.label}>
             Email
@@ -139,7 +136,7 @@ export default function LoginScreen({
           <TextInput
             style={[
               styles.input,
-              errors.email
+              errorMessage
                 ? styles.inputError
                 : null,
             ]}
@@ -151,77 +148,37 @@ export default function LoginScreen({
             autoCapitalize="none"
             autoCorrect={false}
             autoComplete="email"
-            returnKeyType="next"
-            onSubmitEditing={() =>
-              passwordRef.current?.focus()
-            }
-          />
-
-          {errors.email && (
-            <Text style={styles.errorText}>
-              {errors.email}
-            </Text>
-          )}
-
-          {/* Password */}
-
-          <Text style={styles.label}>
-            Password
-          </Text>
-
-          <PasswordInput
-            ref={passwordRef}
-            hasError={Boolean(errors.password)}
-            placeholder="Enter your password"
-            value={password}
-            onChangeText={handlePasswordChange}
-            autoComplete="current-password"
             returnKeyType="done"
-            onSubmitEditing={handleLogin}
+            onFocus={scrollFormIntoView}
+            onSubmitEditing={handleRecovery}
           />
 
-          {errors.password && (
+          {errorMessage !== '' && (
             <Text style={styles.errorText}>
-              {errors.password}
+              {errorMessage}
             </Text>
           )}
-
-          {/* Forgot Password */}
-
-          <Pressable
-            style={styles.forgotPasswordButton}
-            onPress={() =>
-              navigation.navigate('ForgotPassword')
-            }
-            accessibilityRole="button"
-          >
-            <Text style={styles.forgotPasswordText}>
-              Forgot password?
-            </Text>
-          </Pressable>
-
-          {/* Login */}
 
           <Pressable
             style={styles.button}
-            onPress={handleLogin}
+            onPress={handleRecovery}
           >
             <Text style={styles.buttonText}>
-              Log In
+              Send Recovery Instructions
             </Text>
           </Pressable>
 
-          <Text style={styles.signupText}>
-            Don't have an account?{' '}
-            <Text
-              style={styles.signupLink}
-              onPress={() =>
-                navigation.navigate('Signup')
-              }
-            >
-              Sign up
+          <Pressable
+            style={styles.backToLoginButton}
+            onPress={() =>
+              navigation.navigate('Login')
+            }
+            accessibilityRole="button"
+          >
+            <Text style={styles.backToLoginText}>
+              Back to Login
             </Text>
-          </Text>
+          </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -242,7 +199,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingTop: 40,
+    paddingBottom: 120,
   },
 
   brandContainer: {
@@ -283,8 +241,9 @@ const styles = StyleSheet.create({
   subtitle: {
     color: '#999999',
     fontSize: 15,
+    lineHeight: 22,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 10,
     marginBottom: 32,
   },
 
@@ -316,25 +275,12 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
 
-  forgotPasswordButton: {
-    alignSelf: 'flex-end',
-    paddingVertical: 8,
-    paddingLeft: 12,
-    marginBottom: 8,
-  },
-
-  forgotPasswordText: {
-    color: '#e7c86e',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-
   button: {
     backgroundColor: '#e7c86e',
     paddingVertical: 15,
     borderRadius: 4,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 12,
   },
 
   buttonText: {
@@ -343,16 +289,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  signupText: {
-    color: '#888888',
-    textAlign: 'center',
-    marginTop: 24,
-    marginBottom: 10,
-    fontSize: 14,
+  backToLoginButton: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    marginTop: 16,
   },
 
-  signupLink: {
+  backToLoginText: {
     color: '#e7c86e',
+    fontSize: 14,
     fontWeight: '600',
   },
 });

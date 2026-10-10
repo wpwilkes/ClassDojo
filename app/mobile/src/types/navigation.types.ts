@@ -5,4 +5,5 @@ export type RootStackParamList = {
   EmailVerification: {
     email: string;
   };
+  ForgotPassword: undefined;
 };
