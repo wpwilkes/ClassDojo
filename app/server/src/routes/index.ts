@@ -1,7 +1,7 @@
+import pingRouter from './ping.route.js';
 import { Router } from 'express';
-import pingRouter from './ping.routes';
 
-const apiRouter = Router();
+const apiRouter: Router = Router();
 
 apiRouter.use('/ping', pingRouter);
 
