@@ -14,19 +14,14 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { RootStackParamList } from '../types/navigation.types';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Signup'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
-export default function SignupScreen({ navigation }: Props) {
-  const [username, setUsername] = useState('');
+export default function LoginScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
   return (
-    <SafeAreaView
-      style={styles.safeArea}
-      edges={['left', 'right', 'bottom']}
-    >
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -44,19 +39,11 @@ export default function SignupScreen({ navigation }: Props) {
             <Text style={styles.brandName}>Summit</Text>
           </View>
 
-          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.title}>Welcome Back</Text>
 
-          <Text style={styles.subtitle}>Join the discussion.</Text>
-
-          <Text style={styles.label}>Username</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Choose a username"
-            placeholderTextColor="#777777"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-          />
+          <Text style={styles.subtitle}>
+            Log in to continue the discussion.
+          </Text>
 
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -79,27 +66,17 @@ export default function SignupScreen({ navigation }: Props) {
             secureTextEntry
           />
 
-          <Text style={styles.label}>Confirm Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter password again"
-            placeholderTextColor="#777777"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-          />
-
           <Pressable style={styles.button}>
-            <Text style={styles.buttonText}>Sign Up</Text>
+            <Text style={styles.buttonText}>Log In</Text>
           </Pressable>
 
-          <Text style={styles.loginText}>
-            Already have an account?{' '}
+          <Text style={styles.signupText}>
+            Don't have an account?{' '}
             <Text
-              style={styles.loginLink}
-              onPress={() => navigation.navigate('Login')}
+              style={styles.signupLink}
+              onPress={() => navigation.navigate('Signup')}
             >
-              Log in
+              Sign up
             </Text>
           </Text>
         </ScrollView>
@@ -120,16 +97,16 @@ const styles = StyleSheet.create({
 
   content: {
     flexGrow: 1,
+    justifyContent: 'center',
     paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 40,
+    paddingVertical: 40,
   },
 
   brandContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 40,
   },
 
   logoBox: {
@@ -165,7 +142,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: 'center',
     marginTop: 8,
-    marginBottom: 28,
+    marginBottom: 32,
   },
 
   label: {
@@ -183,7 +160,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     color: '#ffffff',
     fontSize: 16,
-    marginBottom: 16,
+    marginBottom: 18,
   },
 
   button: {
@@ -200,15 +177,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  loginText: {
+  signupText: {
     color: '#888888',
     textAlign: 'center',
-    marginTop: 22,
+    marginTop: 24,
     marginBottom: 10,
     fontSize: 14,
   },
 
-  loginLink: {
+  signupLink: {
     color: '#e7c86e',
     fontWeight: '600',
   },
