@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+import PasswordInput from '../components/PasswordInput';
 import { RootStackParamList } from '../types/navigation.types';
 import {
   SignupFormErrors,
@@ -38,29 +39,34 @@ export default function SignupScreen({
   const [errors, setErrors] =
     useState<SignupFormErrors>({});
 
-  const [showPassword, setShowPassword] =
-    useState(false);
-
-  const [
-    showConfirmPassword,
-    setShowConfirmPassword,
-  ] = useState(false);
-
-  // References
   const scrollViewRef = useRef<ScrollView>(null);
+
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
 
+  /*
+   * Store the vertical positions of the password
+   * sections inside the ScrollView.
+   */
+  const passwordPosition = useRef(0);
+  const confirmPasswordPosition = useRef(0);
+
   const emailSuggestion = getEmailSuggestion(email);
 
-  // Scrolls the lower part of the form above the keyboard.
-  const scrollToBottom = () => {
+  /*
+   * Scroll only to the field that has focus.
+   *
+   * We wait briefly because the keyboard needs
+   * time to open and resize the available screen.
+   */
+  const scrollToField = (position: number) => {
     setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({
+      scrollViewRef.current?.scrollTo({
+        y: Math.max(position - 80, 0),
         animated: true,
       });
-    }, 350);
+    }, 250);
   };
 
   const handleSignup = () => {
@@ -172,6 +178,8 @@ export default function SignupScreen({
           }
           showsVerticalScrollIndicator={false}
         >
+          {/* Summit Brand */}
+
           <View style={styles.brandContainer}>
             <View style={styles.logoBox}>
               <Text style={styles.logoText}>S</Text>
@@ -276,139 +284,88 @@ export default function SignupScreen({
 
           {/* Password */}
 
-          <Text style={styles.label}>
-            Password
-          </Text>
-
           <View
-            style={[
-              styles.passwordContainer,
-              errors.password
-                ? styles.inputError
-                : null,
-            ]}
+            onLayout={(event) => {
+              passwordPosition.current =
+                event.nativeEvent.layout.y;
+            }}
           >
-            <TextInput
+            <Text style={styles.label}>
+              Password
+            </Text>
+
+            <PasswordInput
               ref={passwordRef}
-              style={styles.passwordInput}
+              hasError={Boolean(errors.password)}
               placeholder="Enter your password"
-              placeholderTextColor="#777777"
               value={password}
               onChangeText={handlePasswordChange}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              autoCorrect={false}
               autoComplete="new-password"
               returnKeyType="next"
-              onFocus={scrollToBottom}
-              onSubmitEditing={() => {
-                confirmPasswordRef.current?.focus();
-              }}
-            />
-
-            <Pressable
-              style={styles.showButton}
-              onPress={() =>
-                setShowPassword(
-                  (currentValue) =>
-                    !currentValue
+              onFocus={() =>
+                scrollToField(
+                  passwordPosition.current
                 )
               }
-              accessibilityRole="button"
-              accessibilityLabel={
-                showPassword
-                  ? 'Hide password'
-                  : 'Show password'
+              onSubmitEditing={() =>
+                confirmPasswordRef.current?.focus()
               }
-            >
-              <Text
-                style={styles.showButtonText}
-              >
-                {showPassword
-                  ? 'Hide'
-                  : 'Show'}
+            />
+
+            {errors.password && (
+              <Text style={styles.errorText}>
+                {errors.password}
               </Text>
-            </Pressable>
-          </View>
+            )}
 
-          {errors.password && (
-            <Text style={styles.errorText}>
-              {errors.password}
+            <Text style={styles.passwordHint}>
+              Use at least 8 characters with
+              uppercase, lowercase, a number, and
+              a special character
+              (! @ # $ % ^ & *).
             </Text>
-          )}
-
-          <Text style={styles.passwordHint}>
-            Use at least 8 characters with
-            uppercase, lowercase, a number, and
-            a special character (! @ # $ % ^ & *).
-          </Text>
+          </View>
 
           {/* Confirm Password */}
 
-          <Text style={styles.label}>
-            Confirm Password
-          </Text>
-
           <View
-            style={[
-              styles.passwordContainer,
-              errors.confirmPassword
-                ? styles.inputError
-                : null,
-            ]}
+            onLayout={(event) => {
+              confirmPasswordPosition.current =
+                event.nativeEvent.layout.y;
+            }}
           >
-            <TextInput
+            <Text style={styles.label}>
+              Confirm Password
+            </Text>
+
+            <PasswordInput
               ref={confirmPasswordRef}
-              style={styles.passwordInput}
+              hasError={Boolean(
+                errors.confirmPassword
+              )}
               placeholder="Enter password again"
-              placeholderTextColor="#777777"
               value={confirmPassword}
               onChangeText={
                 handleConfirmPasswordChange
               }
-              secureTextEntry={
-                !showConfirmPassword
-              }
-              autoCapitalize="none"
-              autoCorrect={false}
               autoComplete="new-password"
               returnKeyType="done"
-              onFocus={scrollToBottom}
+              onFocus={() =>
+                scrollToField(
+                  confirmPasswordPosition.current
+                )
+              }
               onSubmitEditing={handleSignup}
             />
 
-            <Pressable
-              style={styles.showButton}
-              onPress={() =>
-                setShowConfirmPassword(
-                  (currentValue) =>
-                    !currentValue
-                )
-              }
-              accessibilityRole="button"
-              accessibilityLabel={
-                showConfirmPassword
-                  ? 'Hide confirmed password'
-                  : 'Show confirmed password'
-              }
-            >
-              <Text
-                style={styles.showButtonText}
-              >
-                {showConfirmPassword
-                  ? 'Hide'
-                  : 'Show'}
+            {errors.confirmPassword && (
+              <Text style={styles.errorText}>
+                {errors.confirmPassword}
               </Text>
-            </Pressable>
+            )}
           </View>
 
-          {errors.confirmPassword && (
-            <Text style={styles.errorText}>
-              {errors.confirmPassword}
-            </Text>
-          )}
-
-          {/* Sign Up Button */}
+          {/* Sign Up */}
 
           <Pressable
             style={styles.button}
@@ -450,11 +407,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 24,
-
-    // Extra space is important.
-    // It gives the screen enough room to scroll
-    // the Confirm Password field above the keyboard.
-    paddingBottom: 160,
+    paddingBottom: 120,
   },
 
   brandContainer: {
@@ -516,35 +469,6 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     marginBottom: 8,
-  },
-
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#19191c',
-    borderWidth: 1,
-    borderColor: '#333333',
-    borderRadius: 6,
-    marginBottom: 8,
-  },
-
-  passwordInput: {
-    flex: 1,
-    color: '#ffffff',
-    fontSize: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-  },
-
-  showButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-  },
-
-  showButtonText: {
-    color: '#e7c86e',
-    fontSize: 13,
-    fontWeight: '600',
   },
 
   inputError: {

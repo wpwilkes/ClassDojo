@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+import PasswordInput from '../components/PasswordInput';
 import { RootStackParamList } from '../types/navigation.types';
 import {
   LoginFormErrors,
@@ -34,9 +35,6 @@ export default function LoginScreen({
   const [errors, setErrors] =
     useState<LoginFormErrors>({});
 
-  const [showPassword, setShowPassword] =
-    useState(false);
-
   const passwordRef = useRef<TextInput>(null);
 
   const handleLogin = () => {
@@ -55,7 +53,7 @@ export default function LoginScreen({
 
     // Frontend validation passed.
     // Later:
-    // Send email and password to Wesley's login API.
+    // Send email and password to the login API.
   };
 
   const handleEmailChange = (value: string) => {
@@ -160,51 +158,16 @@ export default function LoginScreen({
             Password
           </Text>
 
-          <View
-            style={[
-              styles.passwordContainer,
-              errors.password
-                ? styles.inputError
-                : null,
-            ]}
-          >
-            <TextInput
-              ref={passwordRef}
-              style={styles.passwordInput}
-              placeholder="Enter your password"
-              placeholderTextColor="#777777"
-              value={password}
-              onChangeText={handlePasswordChange}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="current-password"
-              returnKeyType="done"
-              onSubmitEditing={handleLogin}
-            />
-
-            <Pressable
-              style={styles.showButton}
-              onPress={() =>
-                setShowPassword(
-                  (currentValue) =>
-                    !currentValue
-                )
-              }
-              accessibilityRole="button"
-              accessibilityLabel={
-                showPassword
-                  ? 'Hide password'
-                  : 'Show password'
-              }
-            >
-              <Text style={styles.showButtonText}>
-                {showPassword
-                  ? 'Hide'
-                  : 'Show'}
-              </Text>
-            </Pressable>
-          </View>
+          <PasswordInput
+            ref={passwordRef}
+            hasError={Boolean(errors.password)}
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={handlePasswordChange}
+            autoComplete="current-password"
+            returnKeyType="done"
+            onSubmitEditing={handleLogin}
+          />
 
           {errors.password && (
             <Text style={styles.errorText}>
@@ -316,35 +279,6 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     marginBottom: 8,
-  },
-
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#19191c',
-    borderWidth: 1,
-    borderColor: '#333333',
-    borderRadius: 6,
-    marginBottom: 8,
-  },
-
-  passwordInput: {
-    flex: 1,
-    color: '#ffffff',
-    fontSize: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-  },
-
-  showButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-  },
-
-  showButtonText: {
-    color: '#e7c86e',
-    fontSize: 13,
-    fontWeight: '600',
   },
 
   inputError: {
