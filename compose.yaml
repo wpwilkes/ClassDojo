@@ -9,6 +9,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
 
+    ports:
+      - "5432:5432"
+
     volumes:
       - summit_postgres_data:/var/lib/postgresql/data
 
@@ -16,7 +19,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
         ]
       interval: 5s
       timeout: 5s
@@ -28,15 +31,17 @@ services:
       context: ./app/server
       dockerfile: Dockerfile
 
+    env_file:
+      - .env
+
     init: true
 
     ports:
-      - "127.0.0.1:3000:3000"
+      - "${SERVER_PORT}:3000"
 
     environment:
       SERVER_HOST: 0.0.0.0
-      SERVER_PORT: 3000
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      POSTGRES_HOST: db
 
     depends_on:
       db:

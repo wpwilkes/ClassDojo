@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  posts        Post[]
+  comments     Comment[]
+
+  @@map("users")
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  authorId  Int       @map("author_id")
+  title     String
+  body      String
+  vote      Int       @default(0)
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  author    User      @relation(fields: [authorId], references: [id])
+  comments  Comment[]
+  summaries Summary[]
+
+  @@map("posts")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  postId    Int      @map("post_id")
+  authorId  Int      @map("author_id")
+  body      String
+  vote      Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post      Post     @relation(fields: [postId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id])
+
+  @@map("comments")
+}
+
+model Summary {
+  id           Int      @id @default(autoincrement())
+  postId       Int      @map("post_id")
+  commentCount Int      @map("comment_count")
+  summary      String
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  post         Post     @relation(fields: [postId], references: [id])
+
+  @@map("summaries")
+}
