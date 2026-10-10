@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -13,22 +14,93 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { RootStackParamList } from '../types/navigation.types';
+import {
+  LoginFormErrors,
+  hasLoginErrors,
+  validateLoginForm,
+} from '../utils/authValidation';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
+type Props = NativeStackScreenProps<
+  RootStackParamList,
+  'Login'
+>;
 
-export default function LoginScreen({ navigation }: Props) {
+export default function LoginScreen({
+  navigation,
+}: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const [errors, setErrors] =
+    useState<LoginFormErrors>({});
+
+  const [showPassword, setShowPassword] =
+    useState(false);
+
+  const passwordRef = useRef<TextInput>(null);
+
+  const handleLogin = () => {
+    Keyboard.dismiss();
+
+    const validationErrors = validateLoginForm({
+      email,
+      password,
+    });
+
+    setErrors(validationErrors);
+
+    if (hasLoginErrors(validationErrors)) {
+      return;
+    }
+
+    // Frontend validation passed.
+    // Later:
+    // Send email and password to Wesley's login API.
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+
+    if (errors.email) {
+      setErrors((currentErrors) => ({
+        ...currentErrors,
+        email: undefined,
+      }));
+    }
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+
+    if (errors.password) {
+      setErrors((currentErrors) => ({
+        ...currentErrors,
+        password: undefined,
+      }));
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={['top', 'bottom']}
+    >
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={
+          Platform.OS === 'ios'
+            ? 'padding'
+            : 'height'
+        }
       >
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={
+            Platform.OS === 'ios'
+              ? 'interactive'
+              : 'on-drag'
+          }
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.brandContainer}>
@@ -36,45 +108,128 @@ export default function LoginScreen({ navigation }: Props) {
               <Text style={styles.logoText}>S</Text>
             </View>
 
-            <Text style={styles.brandName}>Summit</Text>
+            <Text style={styles.brandName}>
+              Summit
+            </Text>
           </View>
 
-          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.title}>
+            Welcome Back
+          </Text>
 
           <Text style={styles.subtitle}>
             Log in to continue the discussion.
           </Text>
 
-          <Text style={styles.label}>Email</Text>
+          {/* Email */}
+
+          <Text style={styles.label}>
+            Email
+          </Text>
+
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              errors.email
+                ? styles.inputError
+                : null,
+            ]}
             placeholder="Enter your email"
             placeholderTextColor="#777777"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={handleEmailChange}
             keyboardType="email-address"
             autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="email"
+            returnKeyType="next"
+            onSubmitEditing={() =>
+              passwordRef.current?.focus()
+            }
           />
 
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
-            placeholderTextColor="#777777"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+          {errors.email && (
+            <Text style={styles.errorText}>
+              {errors.email}
+            </Text>
+          )}
 
-          <Pressable style={styles.button}>
-            <Text style={styles.buttonText}>Log In</Text>
+          {/* Password */}
+
+          <Text style={styles.label}>
+            Password
+          </Text>
+
+          <View
+            style={[
+              styles.passwordContainer,
+              errors.password
+                ? styles.inputError
+                : null,
+            ]}
+          >
+            <TextInput
+              ref={passwordRef}
+              style={styles.passwordInput}
+              placeholder="Enter your password"
+              placeholderTextColor="#777777"
+              value={password}
+              onChangeText={handlePasswordChange}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="current-password"
+              returnKeyType="done"
+              onSubmitEditing={handleLogin}
+            />
+
+            <Pressable
+              style={styles.showButton}
+              onPress={() =>
+                setShowPassword(
+                  (currentValue) =>
+                    !currentValue
+                )
+              }
+              accessibilityRole="button"
+              accessibilityLabel={
+                showPassword
+                  ? 'Hide password'
+                  : 'Show password'
+              }
+            >
+              <Text style={styles.showButtonText}>
+                {showPassword
+                  ? 'Hide'
+                  : 'Show'}
+              </Text>
+            </Pressable>
+          </View>
+
+          {errors.password && (
+            <Text style={styles.errorText}>
+              {errors.password}
+            </Text>
+          )}
+
+          {/* Login Button */}
+
+          <Pressable
+            style={styles.button}
+            onPress={handleLogin}
+          >
+            <Text style={styles.buttonText}>
+              Log In
+            </Text>
           </Pressable>
 
           <Text style={styles.signupText}>
             Don't have an account?{' '}
             <Text
               style={styles.signupLink}
-              onPress={() => navigation.navigate('Signup')}
+              onPress={() =>
+                navigation.navigate('Signup')
+              }
             >
               Sign up
             </Text>
@@ -160,7 +315,46 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     color: '#ffffff',
     fontSize: 16,
-    marginBottom: 18,
+    marginBottom: 8,
+  },
+
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#19191c',
+    borderWidth: 1,
+    borderColor: '#333333',
+    borderRadius: 6,
+    marginBottom: 8,
+  },
+
+  passwordInput: {
+    flex: 1,
+    color: '#ffffff',
+    fontSize: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+
+  showButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+
+  showButtonText: {
+    color: '#e7c86e',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+
+  inputError: {
+    borderColor: '#d96565',
+  },
+
+  errorText: {
+    color: '#ff9f9f',
+    fontSize: 13,
+    marginBottom: 14,
   },
 
   button: {
@@ -168,7 +362,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 4,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 10,
   },
 
   buttonText: {

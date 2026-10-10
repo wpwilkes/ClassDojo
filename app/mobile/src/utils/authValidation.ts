@@ -117,3 +117,46 @@ export function hasSignupErrors(
 ): boolean {
   return Object.keys(errors).length > 0;
 }
+
+export type LoginFormData = {
+  email: string;
+  password: string;
+};
+
+export type LoginFormErrors = {
+  email?: string;
+  password?: string;
+};
+
+export function validateLoginForm(
+  data: LoginFormData
+): LoginFormErrors {
+  const errors: LoginFormErrors = {};
+
+  const email = data.email.trim();
+  const password = data.password;
+
+  if (!email) {
+    errors.email = 'Email is required.';
+  } else {
+    const emailPattern =
+      /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/;
+
+    if (!emailPattern.test(email)) {
+      errors.email =
+        'Please enter a valid email address.';
+    }
+  }
+
+  if (!password) {
+    errors.password = 'Password is required.';
+  }
+
+  return errors;
+}
+
+export function hasLoginErrors(
+  errors: LoginFormErrors
+): boolean {
+  return Object.keys(errors).length > 0;
+}
