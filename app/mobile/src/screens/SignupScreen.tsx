@@ -45,20 +45,16 @@ export default function SignupScreen({
   const passwordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
 
-  /*
-   * Store the vertical positions of the password
-   * sections inside the ScrollView.
-   */
+  // Stores the vertical positions of the password sections.
   const passwordPosition = useRef(0);
   const confirmPasswordPosition = useRef(0);
 
   const emailSuggestion = getEmailSuggestion(email);
 
   /*
-   * Scroll only to the field that has focus.
-   *
-   * We wait briefly because the keyboard needs
-   * time to open and resize the available screen.
+   * Scroll only to the field that receives focus.
+   * This prevents the screen from jumping all the way
+   * to Confirm Password when Password is selected.
    */
   const scrollToField = (position: number) => {
     setTimeout(() => {
@@ -85,9 +81,19 @@ export default function SignupScreen({
       return;
     }
 
-    // Frontend validation passed.
-    // Later:
-    // Send registration information to backend API.
+    /*
+     * Frontend validation passed.
+     *
+     * FUTURE BACKEND STEP:
+     * Send username, email, and password
+     * to Wesley's registration API.
+     *
+     * After successful registration:
+     *
+     * navigation.navigate('EmailVerification', {
+     *   email: email.trim(),
+     * });
+     */
   };
 
   const handleUsernameChange = (value: string) => {
@@ -376,6 +382,43 @@ export default function SignupScreen({
             </Text>
           </Pressable>
 
+          {/* =====================================================
+              TEMPORARY DEVELOPMENT TEST ONLY
+
+              PURPOSE:
+              Opens EmailVerificationScreen before Wesley's
+              registration API is available.
+
+              REMOVE THIS ENTIRE __DEV__ BLOCK after the real
+              signup API is connected and successful registration
+              automatically navigates to EmailVerification.
+
+              Search this file later for:
+              "TEMPORARY DEVELOPMENT TEST"
+             ===================================================== */}
+          {__DEV__ && (
+            <Pressable
+              style={styles.devTestButton}
+              onPress={() =>
+                navigation.navigate(
+                  'EmailVerification',
+                  {
+                    email:
+                      email.trim() ||
+                      'test@example.com',
+                  }
+                )
+              }
+            >
+              <Text
+                style={styles.devTestButtonText}
+              >
+                DEV: Test Email Verification
+              </Text>
+            </Pressable>
+          )}
+          {/* END TEMPORARY DEVELOPMENT TEST */}
+
           <Text style={styles.loginText}>
             Already have an account?{' '}
             <Text
@@ -514,6 +557,31 @@ const styles = StyleSheet.create({
     color: '#111111',
     fontSize: 16,
     fontWeight: '700',
+  },
+
+  // =========================================================
+  // TEMPORARY DEVELOPMENT TEST STYLES
+  //
+  // REMOVE these two styles when the real signup API
+  // replaces the temporary Email Verification test button.
+  //
+  // Search this file later for:
+  // "TEMPORARY DEVELOPMENT TEST"
+  // =========================================================
+
+  devTestButton: {
+    borderWidth: 1,
+    borderColor: '#555555',
+    borderRadius: 4,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 14,
+  },
+
+  devTestButtonText: {
+    color: '#888888',
+    fontSize: 13,
+    fontWeight: '600',
   },
 
   loginText: {
